@@ -4,26 +4,29 @@ import time
 
 st.title("부천고 챗봇")
 
-if "api_key" not in st.session_state:
-    st.session_state["api_key"] = st.text_input("OpenAI API 키를 입력하세요:", type="password")
-    if st.session_state["api_key"]:
-        st.success("API 키가 설정되었습니다.")
-else:
-    client = OpenAI(api_key=st.session_state["api_key"])
+
 
 with st.sidebar:
     "[부천고등학교 홈페이지](https://bch-h.goebc.kr/bch-h/main.do)"
+    openai_api_key = st.text_input("OpenAI API KEY", key="chatbot_api_key", type="password")
 
+    client = OpenAI(api_key= openai_api_key)
+    
     thread_id = st.text_input("쓰레드 ID")
 
     thread_btn = st.button("쓰레드 만들기")
-
+    if not openai_api_key:
+        st.info("API키를 입력해 주세요")
+        st.stop()
     if thread_btn:
         thread = client.beta.threads.create()
         thread_id = thread.id
 
         st.subheader(f"{thread_id}", divider="rainbow")
         st.info("쓰레드가 생성되었습니다.")
+    if not thread_id:
+        st.info("쓰레드 아이디를 추가해 주세요")
+        st.stop()
 
 assistant_id = "asst_QcmomMBaccpaVZaiAfRMOsSg"
 
@@ -37,9 +40,6 @@ for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
 if prompt := st.chat_input():
-    if not thread_id:
-        st.info("쓰레드 아이디를 추가해 주세요")
-        st.stop()
     
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
