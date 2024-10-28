@@ -4,7 +4,12 @@ import time
 
 st.title("부천고 챗봇")
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+if "api_key" not in st.session_state:
+    st.session_state["api_key"] = st.text_input("OpenAI API 키를 입력하세요:", type="password")
+    if st.session_state["api_key"]:
+        st.success("API 키가 설정되었습니다.")
+else:
+    client = OpenAI(api_key=st.session_state["api_key"])
 
 with st.sidebar:
     "[부천고등학교 홈페이지](https://bch-h.goebc.kr/bch-h/main.do)"
